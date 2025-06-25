@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sheep | Dashboard</title>
+    <link rel="icon" href="sheep.svg" type="image/svg+xml"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+
+    <style>
+        #map { height: 100vh; cursor: grab; }
+        #map:active { cursor: grabbing; }
+        .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { display: none !important; }
+    </style>
+
+    <style>
+        @keyframes vibrate {
+            0% { transform: translate(0); }
+            20% { transform: translate(-0.35px, 0.35px); }
+            40% { transform: translate(-0.35px, -0.35px); }
+            60% { transform: translate(0.35px, 0.35px); }
+            80% { transform: translate(0.35px, -0.35px); }
+            100% { transform: translate(0); }
+        }
+
+        .icon-hover:hover svg {
+        animation: vibrate 0.25s ease-in-out;
+        }
+    </style>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#212121] text-[#FFFFFF] flex flex-row min-h-screen">
+    <nav class="fixed bottom-0 left-0 w-full flex flex-row justify-around border-t border-[#292929] bg-[#212121] md:bg-[#181818] p-2 items-center md:relative md:top-0 md:left-auto md:w-auto md:flex-col md:items-start md:justify-start md:min-h-screen md:border-r md:border-t-0 md:p-3.5 md:gap-9">
+        <a href="/" class="hidden md:flex">
+            <svg class="size-9" viewBox="0 0 618 508" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M390.535 0.0164533C419.007 -0.500547 440.841 11.1665 456.035 35.0165C471.045 62.1735 463.211 76.6735 432.535 78.5165C427.246 77.2105 423.079 74.3775 420.035 70.0165C416.453 61.2565 412.12 52.9225 407.035 45.0165C400.439 35.7995 391.605 32.2995 380.535 34.5165C372.863 38.6835 365.53 43.3505 358.535 48.5165C355.079 49.6395 352.245 48.8065 350.035 46.0165C352.663 21.2165 366.163 5.88245 390.535 0.0164533Z" fill="currentColor"/>
+                <path d="M469.535 1.01631C483.568 0.282308 494.735 5.61531 503.035 17.0163C512.26 29.6853 517.76 43.8513 519.535 59.5163C519.7 62.4333 519.033 65.0993 517.535 67.5163C515.868 68.1833 514.202 68.1833 512.535 67.5163C496.702 57.0163 483.535 43.8493 473.035 28.0163C470.447 23.8423 468.114 19.5093 466.035 15.0163C464.531 9.52631 465.698 4.85931 469.535 1.01631Z" fill="currentColor"/>
+                <path d="M582.535 114.017C593.785 114.634 604.119 118.134 613.535 124.517C619.246 131.211 618.579 137.211 611.535 142.517C605.831 143.832 600.831 142.499 596.535 138.517C589.55 132.859 584.55 125.859 581.535 117.517C581.683 116.261 582.017 115.094 582.535 114.017Z" fill="currentColor"/>
+                <path d="M465.535 415.017C467.032 420.176 468.699 425.176 470.535 430.017C472.423 437.07 473.756 444.237 474.535 451.517C472.832 468.894 463.499 479.894 446.535 484.517C440.535 485.184 434.535 485.184 428.535 484.517C421.854 482.504 417.021 478.337 414.035 472.017C403.902 441.022 394.902 409.689 387.035 378.017C386.061 373.05 383.394 369.383 379.035 367.017C377.091 367.956 375.424 369.29 374.035 371.017C370.309 379.527 366.976 388.194 364.035 397.017C358.959 408.674 351.792 418.841 342.535 427.517C324.507 439.633 309.007 437.133 296.035 420.017C295.232 417.273 294.232 414.606 293.035 412.017C292.855 405.674 292.855 399.341 293.035 393.017C292.296 391.943 291.296 391.276 290.035 391.017C281.72 395.322 274.553 401.155 268.535 408.517C238.815 429.526 206.482 434.859 171.535 424.517C166.341 422.426 161.674 419.593 157.535 416.017C148.48 406.186 145.813 394.852 149.535 382.017C153.426 370.291 159.26 359.625 167.035 350.017C168.185 347.763 168.519 345.43 168.035 343.017C164.962 341.9 161.795 341.733 158.535 342.517C146.561 347.778 134.061 350.611 121.035 351.017C93.9069 350.23 77.2399 336.564 71.0349 310.017C67.6889 293.367 69.5219 277.367 76.5349 262.017C80.8219 254.73 86.4889 248.73 93.5349 244.017C105.002 238.144 116.835 237.477 129.035 242.017C136.619 242.123 138.952 238.789 136.035 232.017C123.77 224.084 113.104 214.418 104.035 203.017C93.7279 184.271 97.5619 169.105 115.535 157.517C125.113 151.713 135.446 148.213 146.535 147.017C147.202 146.684 147.868 146.35 148.535 146.017C173.891 144.1 196.224 151.266 215.535 167.517C217.38 168.645 219.38 169.145 221.535 169.017C221.618 162.092 220.951 155.259 219.535 148.517C220.661 135.075 227.994 129.409 241.535 131.517C256.847 135.507 270.847 142.174 283.535 151.517C314.17 175.941 341.336 203.774 365.035 235.017C407.025 289.971 440.525 349.971 465.535 415.017Z" fill="currentColor"/>
+                <path d="M34.5345 330.017C37.8845 329.852 41.2175 330.019 44.5345 330.517C47.6645 332.645 50.4975 335.145 53.0345 338.017C59.0665 346.746 64.0665 356.079 68.0345 366.017C70.4635 371.887 69.9635 377.387 66.5345 382.517C55.4365 388.067 44.1025 393.067 32.5345 397.517C10.1385 398.786 -0.694527 388.286 0.0344733 366.017C3.27947 356.036 9.11247 347.87 17.5345 341.517C23.2665 337.661 28.9335 333.827 34.5345 330.017Z" fill="currentColor"/>
+                <path d="M473.535 91.0164C515.601 88.8064 550.434 103.473 578.035 135.016C597.298 156.541 609.965 181.541 616.035 210.016C620.678 233.809 616.011 255.476 602.035 275.016C592.632 284.969 581.132 291.136 567.535 293.516C541.682 297.013 517.015 293.013 493.535 281.516C479.67 275.087 466.337 267.921 453.535 260.016C452.09 258.453 450.424 257.12 448.535 256.016C433.667 246.13 420.167 234.463 408.035 221.016C401.624 211.624 397.458 201.29 395.535 190.016C395.837 187.457 395.503 185.123 394.535 183.016C394.659 171.542 393.492 160.208 391.035 149.016C386.401 136.056 377.235 128.555 363.535 126.516C358.868 125.849 354.202 125.849 349.535 126.516C346.828 128.38 345.994 130.88 347.035 134.016C349.035 136.683 351.035 139.349 353.035 142.016C354.446 144.166 355.28 146.5 355.535 149.016V151.016C352.481 154.382 348.647 155.715 344.035 155.016C328.387 153.362 316.721 145.695 309.035 132.016C308.54 130.043 308.373 128.043 308.535 126.016C311.414 120.464 315.414 115.798 320.535 112.016C336.015 100.123 353.348 96.6234 372.535 101.516C382.093 103.794 391.093 107.461 399.535 112.516C402.535 113.183 405.535 113.183 408.535 112.516C419.429 108.736 430.095 104.402 440.535 99.5164C447.045 97.0564 453.711 95.2223 460.535 94.0164C465.018 93.1434 469.352 92.1433 473.535 91.0164ZM530.035 160.016C528.141 156.672 525.308 155.338 521.535 156.016C511.697 166.041 508.197 178.041 511.035 192.016C513.237 203.189 519.737 207.355 530.535 204.516C537.36 199.384 539.86 192.551 538.035 184.016C536.582 178.393 533.082 175.06 527.535 174.016C529.019 169.426 529.852 164.759 530.035 160.016ZM572.535 152.516C569.112 150.612 565.445 149.779 561.535 150.016C559.644 152.352 559.144 155.018 560.035 158.016C563.397 162.546 566.564 167.213 569.535 172.016C567.782 174.521 566.282 177.188 565.035 180.016C563.258 188.277 565.758 194.777 572.535 199.516C581.962 201.225 587.462 197.392 589.035 188.016C588.837 173.785 583.337 161.951 572.535 152.516Z" fill="currentColor"/>
+                <path d="M145.535 440.017C146.244 440.921 147.244 441.254 148.535 441.017C160.242 446.227 168.409 454.894 173.035 467.017C174.301 473.112 173.301 478.779 170.035 484.017C160.486 494.245 149.319 502.078 136.535 507.517C122.071 509.038 111.904 503.205 106.035 490.017C105.158 483.268 105.491 476.601 107.035 470.017C112.836 456.551 122.336 446.717 135.535 440.517C138.852 440.019 142.185 439.852 145.535 440.017Z" fill="currentColor"/>
+                <path d="M541.535 360.017C549.849 359.179 557.516 361.012 564.535 365.517C574.854 372.168 582.687 381.001 588.035 392.017C591.762 410.061 585.596 423.561 569.535 432.517C552.52 437.26 540.687 431.426 534.035 415.017C529.987 403.347 527.987 391.347 528.035 379.017C530.099 370.812 534.599 364.478 541.535 360.017Z" fill="currentColor"/>
+            </svg>
+        </a>
+
+        <button class="text-[#676767] hover:text-[#FFFFFF] transition-colors duration-300 icon-hover mx-auto hidden md:flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21 21-4.34-4.34"/>
+                <circle cx="11" cy="11" r="8"/>
+            </svg>
+        </button>
+
+        <div class="grid grid-cols-5 items-center justify-items-center gap-6 w-full mx-auto md:flex md:flex-col md:justify-center md:items-center">
+            <a href="/">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
+                    <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                </svg>
+            </a>
+
+            <a href="/" class="text-[#676767] hover:text-[#FFFFFF] transition-colors duration-300 icon-hover">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 18v-6a5 5 0 1 1 10 0v6"/>
+                    <path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/>
+                    <path d="M21 12h1"/>
+                    <path d="M18.5 4.5 18 5"/>
+                    <path d="M2 12h1"/>
+                    <path d="M12 2v1"/>
+                    <path d="m4.929 4.929.707.707"/>
+                    <path d="M12 12v6"/>
+                </svg>
+            </a>
+
+            <a href="/" class="text-[#676767] hover:text-[#FFFFFF] transition-colors duration-300 icon-hover">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="14" height="8" x="5" y="2" rx="2"/>
+                    <rect width="20" height="8" x="2" y="14" rx="2"/>
+                    <path d="M6 18h2"/>
+                    <path d="M12 18h6"/>
+                </svg>
+            </a>
+
+            <a href="/" class="text-[#676767] hover:text-[#FFFFFF] transition-colors duration-300 icon-hover">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+                    <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+                    <path d="M10 9H8"/>
+                    <path d="M16 13H8"/>
+                    <path d="M16 17H8"/>
+                </svg>
+            </a>
+
+            <a href="/" class="text-[#676767] hover:text-[#FFFFFF] transition-colors duration-300 icon-hover">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <nav class="sticky top-0 flex items-center p-4 z-10 border-[#292929] border-b">
+            <div class="flex items-center gap-1">
+                <p>Dylan</p>
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"/>
+                    <path d="m12 5 7 7-7 7"/>
+                </svg>
+
+                <p>Dashboard</p>
+            </div>
+            
+            <div class="ml-auto flex items-center gap-5">
+                <button class="text-[#676767] hover:text-[#FFFFFF] transition-colors duration-300 icon-hover mx-auto flex md:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m21 21-4.34-4.34"/>
+                        <circle cx="11" cy="11" r="8"/>
+                    </svg>
+                </button>
+                
+                <div class="relative ml-auto">
+                    <button class="menu-toggle bg-[#0169CC] w-8 h-8 flex items-center justify-center rounded-full">
+                        <span class="text-xs">DS</span>
+                    </button>
+
+                    <div class="menu hidden absolute right-0 mt-1 w-64 border-[#292929] bg-[#181818] border rounded rounded-md z-10 text-sm">
+                        <div class="p-2">
+                            <p>Dylan Sutton Chavez</p>
+                            <p class="text-xs text-[#B0B0B0]">dylan718281@gmail.com</p>
+                        </div>
+                        <hr class="border-[#E5E5E5] dark:border-[#262626]">
+                        <div class="p-0.5">
+                            <a href="/home" class="flex items-center gap-3 px-1.5 py-1 rounded-md hover:bg-[#262626] transition-colors duration-300 w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
+                                    <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                                <p>Home</p>
+                            </a>
+
+                            <a href="/dashboard" class="flex items-center gap-3 px-1.5 py-1 rounded-md hover:bg-[#262626] transition-colors duration-300 w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                                    <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                                    <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                                    <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+                                </svg>
+                                <p>Dashboard</p>
+                            </a>
+
+                            <a href="/account" class="flex items-center gap-3 px-1.5 py-1 rounded-md hover:bg-[#262626] transition-colors duration-300 w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="8" r="5"></circle>
+                                    <path d="M20 21a8 8 0 0 0-16 0"></path>
+                                </svg>
+                                <p>Account</p>
+                            </a>
+
+                            <a href="mailto:dylan618071@gmail.com" class="flex items-center gap-3 px-1.5 py-1 rounded-md hover:bg-[#262626] transition-colors duration-300 w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m8 2 1.88 1.88"></path>
+                                    <path d="M14.12 3.88 16 2"></path>
+                                    <path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"></path>
+                                    <path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"></path>
+                                    <path d="M12 20v-9"></path>
+                                    <path d="M6.53 9C4.6 8.8 3 7.1 3 5"></path>
+                                    <path d="M6 13H2"></path>
+                                    <path d="M3 21c0-2.1 1.7-3.9 3.8-4"></path>
+                                    <path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"></path>
+                                    <path d="M22 13h-4"></path>
+                                    <path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"></path>
+                                </svg>
+                                <p>Report a bug</p>
+
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-[#676767] ml-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 7h10v10"></path>
+                                    <path d="M7 17 17 7"></path>
+                                </svg>
+                            </a>
+
+                            <a href="https://discord.gg/jdueFCct9m" target="_blank" class="flex items-center gap-3 px-1.5 py-1 rounded-md hover:bg-[#262626] transition-colors duration-300 w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 20v-9H2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2Z"></path>
+                                    <path d="M18 11V4H6v7"></path>
+                                    <path d="M15 22v-4a3 3 0 0 0-3-3a3 3 0 0 0-3 3v4"></path>
+                                    <path d="M22 11V9"></path>
+                                    <path d="M2 11V9"></path>
+                                    <path d="M6 4V2"></path>
+                                    <path d="M18 4V2"></path>
+                                    <path d="M10 4V2"></path>
+                                    <path d="M14 4V2"></path>
+                                </svg>
+                                <p>Community</p>
+
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 text-[#676767] ml-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 7h10v10"></path>
+                                    <path d="M7 17 17 7"></path>
+                                </svg>
+                            </a>
+
+                            <a href="/logout" class="flex items-center gap-3 px-1.5 py-1 rounded-md hover:bg-[#262626] transition-colors duration-300 w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m16 17 5-5-5-5"></path>
+                                    <path d="M21 12H9"></path>
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                </svg>
+                                <p>Log out</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div id="map" class="flex-1"></div>
+        
+    </main>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic3V0dG9uZHlsYW4iLCJhIjoiY21jY2JobHhtMDZobjJrcXo0eHA4aGdsZCJ9.5OPwNndbcBR2_HzpAAJQTQ';
+        const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/dark-v11',
+        projection: 'globe',
+        center: [0, 0],
+        zoom: 1.5,
+        dragRotate: true,
+        touchZoomRotate: true
+        });
+
+        map.on('style.load', () => {
+
+        map.getStyle().layers.forEach(({ id, type }) => {
+            if (type === 'fill') map.setPaintProperty(id, 'fill-color', '#191919');
+            if (type === 'line') map.setPaintProperty(id, 'line-color', '#666666');
+            if (type === 'symbol') map.setPaintProperty(id, 'text-color', '#aaa');
+        });
+
+        map.setFog(null);
+
+        map.addSource('puntos', {
+            type: 'geojson',
+            data: {
+            type: 'FeatureCollection',
+            features: [
+                { type: 'Feature', geometry: { type: 'Point', coordinates: [-74.006, 40.7128] } }, // Nueva York
+                { type: 'Feature', geometry: { type: 'Point', coordinates: [2.3522, 48.8566] } }  // París
+            ]
+            }
+        });
+
+        map.addLayer({
+            id: 'puntos-azules',
+            type: 'circle',
+            source: 'puntos',
+            paint: {
+            'circle-radius': 1.5,
+            'circle-color': 'rgba(104, 143, 222, 1)'
+            }
+        });
+
+        let isRotating = true, lastTime = performance.now();
+        const rotationSpeed = 1;
+
+        const rotateGlobe = time => {
+            if (isRotating) {
+            const deltaTime = (time - lastTime) / 1000;
+            const { lng, lat } = map.getCenter();
+            map.setCenter([lng + rotationSpeed * deltaTime, lat]);
+            }
+            lastTime = time;
+            requestAnimationFrame(rotateGlobe);
+        };
+
+        requestAnimationFrame(rotateGlobe);
+
+        const pause = () => isRotating = false;
+        const resume = () => { isRotating = true; lastTime = performance.now(); };
+        let wheelTimeout;
+
+        ['mousedown', 'touchstart', 'wheel', 'dragstart'].forEach(e => map.on(e, pause));
+        ['mouseup', 'touchend', 'dragend'].forEach(e => map.on(e, resume));
+        map.on('wheel', () => {
+            clearTimeout(wheelTimeout);
+            wheelTimeout = setTimeout(resume, 200);
+        });
+        });
+    </script>
+
+    <script>
+        document.querySelectorAll('.menu-toggle').forEach(button => {
+            button.addEventListener('click', function () {
+            const menu = this.nextElementSibling;
+            if (menu && menu.classList.contains('menu')) {
+                menu.classList.toggle('hidden');
+            }
+            });
+        });
+
+        document.addEventListener('click', function (e) {
+            document.querySelectorAll('.menu').forEach(menu => {
+            const toggle = menu.previousElementSibling;
+            if (!menu.contains(e.target) && (!toggle || !toggle.contains(e.target))) {
+                menu.classList.add('hidden');
+            }
+            });
+        });
+    </script>
+</body>
+</html>
